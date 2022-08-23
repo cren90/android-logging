@@ -7,7 +7,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "$rootProject.ext.library_group" + "." + "$rootProject.ext.library_artifact" + ".sample"
+        applicationId "com.cren90.android.logging.sample"
         minSdk 16
         targetSdk 32
         versionCode 1
