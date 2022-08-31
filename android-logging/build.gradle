@@ -9,7 +9,7 @@ kapt {
     correctErrorTypes = true
 }
 
-ext.library_version='1.0.0'
+ext.library_version='1.0.1'
 
 afterEvaluate {
     publishing {
