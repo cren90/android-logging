@@ -7,6 +7,9 @@ import dagger.hilt.components.SingletonComponent
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
+/**
+ * Delegate for retrieving a [Logger] implementation
+ */
 @Suppress("unused")
 class LoggerDelegate<in T : Any> : ReadOnlyProperty<T, Logger> {
 

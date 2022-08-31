@@ -6,6 +6,7 @@ interface LoggerContextProvider {
     val context: Context
 }
 
+@Suppress("unused")
 class LoggerContextDelegate(override val context: Context): LoggerContextProvider {
     init {
         LoggerContextProviderHolder.loggerContextProvider = this

@@ -1,5 +1,8 @@
 package com.cren90.android.logging.strategies
 
+/**
+ * Wrapper interface around logging various messages to different locations (Logcat, Splunk, Crashlytics, Datadog, etc)
+ */
 interface LogStrategy {
 
     /**
