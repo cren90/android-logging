@@ -16,6 +16,10 @@ class LoggerDelegate<in T : Any> : ReadOnlyProperty<T, Logger> {
     private lateinit var loggerEntryPoint: LoggerDelegateEntryPoint
 
     override fun getValue(thisRef: T, property: KProperty<*>): Logger {
+        return getLogger()
+    }
+
+    private fun getLogger(): Logger {
         if (!::loggerEntryPoint.isInitialized)
             synchronized(loggerEntryPoint) {
                 if (!::loggerEntryPoint.isInitialized) {
