@@ -11,15 +11,15 @@ import kotlin.reflect.KProperty
  * Delegate for retrieving a [Logger] implementation
  */
 @Suppress("unused")
-class LoggerDelegate<in T : Any> : ReadOnlyProperty<T, Logger> {
+class LoggerDelegate<in T> : ReadOnlyProperty<T, Logger> {
 
     private lateinit var loggerEntryPoint: LoggerDelegateEntryPoint
 
-    override fun getValue(thisRef: T, property: KProperty<*>): Logger {
-        return getLogger()
+    override operator fun getValue(thisRef: T, property: KProperty<*>): Logger {
+        return getLogger(thisRef)
     }
 
-    private fun getLogger(): Logger {
+    private fun getLogger(thisRef: T): Logger {
         if (!::loggerEntryPoint.isInitialized)
             synchronized(loggerEntryPoint) {
                 if (!::loggerEntryPoint.isInitialized) {
@@ -37,7 +37,16 @@ class LoggerDelegate<in T : Any> : ReadOnlyProperty<T, Logger> {
                     }
                 }
             }
-        return loggerEntryPoint.logger
+        return loggerEntryPoint.logger.let {
+            if(thisRef is Any) {
+                // Force unwrap nullable here because otherwise the compiler complains. We already
+                // know it's not null because it is a subclass of Any and not Any?
+                @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+                it.withTag(thisRef!!::class.java.simpleName)
+            } else {
+                it
+            }
+        }
     }
 }
 
