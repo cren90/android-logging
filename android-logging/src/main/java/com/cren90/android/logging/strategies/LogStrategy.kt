@@ -1,9 +1,12 @@
 package com.cren90.android.logging.strategies
 
+import com.cren90.android.logging.splitter.LogSplitter
+
 /**
  * Wrapper interface around logging various messages to different locations (Logcat, Splunk, Crashlytics, Datadog, etc)
  */
 interface LogStrategy {
+    val logSplitter: LogSplitter
 
     /**
      * Logs a fatal [message] with a given [tag] and any associated [data]

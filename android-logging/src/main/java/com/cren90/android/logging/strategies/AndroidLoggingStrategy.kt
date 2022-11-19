@@ -2,6 +2,8 @@ package com.cren90.android.logging.strategies
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
+import com.cren90.android.logging.splitter.AndroidLogSplitter
+import com.cren90.android.logging.splitter.LogSplitter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -9,15 +11,13 @@ import com.google.gson.reflect.TypeToken
 /**
  * Logging strategy for logging to Android Logcat
  */
-class AndroidLoggingStrategy : LogStrategy {
-
-    private val TRACE = 1
+class AndroidLoggingStrategy(override val logSplitter: LogSplitter = AndroidLogSplitter()) : LogStrategy {
 
     /**
      * Visible for unit testing only.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    fun getDataString(data: Map<String, Any?>): String {
+    internal fun getDataString(data: Map<String, Any?>): String {
         val gson: Gson = GsonBuilder()
             .serializeNulls()
             .setPrettyPrinting()
@@ -30,31 +30,54 @@ class AndroidLoggingStrategy : LogStrategy {
         return gsonString
     }
 
-    private fun getMessageWithData(message: String?, data: Map<String, Any?>?): String {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun getMessageWithData(message: String?, data: Map<String, Any?>?): String {
         return "${message ?: "No message"}${if (!data.isNullOrEmpty()) "\ndata:${getDataString(data)}" else ""}"
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun logWithFunction(tag: String, message: String?, data: Map<String, Any?>?, log: (logTag: String, logMessage: String) -> Unit) {
+        logSplitter.split(
+            message = getMessageWithData(message, data),
+            splitNewLines = true
+        ).forEach {
+            log(tag, it)
+        }
+    }
+
     override fun fatal(message: String?, tag: String, data: Map<String, Any?>?) {
-        Log.wtf(tag, getMessageWithData(message, data))
+        logWithFunction(tag, message, data) { logTag, logMessage ->
+            Log.wtf(logTag, logMessage)
+        }
     }
 
     override fun error(message: String?, tag: String, data: Map<String, Any?>?) {
-        Log.e(tag, getMessageWithData(message, data))
+        logWithFunction(tag, message, data) { logTag, logMessage ->
+            Log.e(logTag, logMessage)
+        }
     }
 
     override fun warning(message: String?, tag: String, data: Map<String, Any?>?) {
-        Log.w(tag, getMessageWithData(message, data))
+        logWithFunction(tag, message, data) { logTag, logMessage ->
+            Log.w(logTag, logMessage)
+        }
     }
 
     override fun info(message: String?, tag: String, data: Map<String, Any?>?) {
-        Log.i(tag, getMessageWithData(message, data))
+        logWithFunction(tag, message, data) { logTag, logMessage ->
+            Log.i(logTag, logMessage)
+        }
     }
 
     override fun debug(message: String?, tag: String, data: Map<String, Any?>?) {
-        Log.d(tag, getMessageWithData(message, data))
+        logWithFunction(tag, message, data) { logTag, logMessage ->
+            Log.d(logTag, logMessage)
+        }
     }
 
     override fun verbose(message: String?, tag: String, data: Map<String, Any?>?) {
-        Log.v(tag, getMessageWithData(message, data))
+        logWithFunction(tag, message, data) { logTag, logMessage ->
+            Log.v(logTag, logMessage)
+        }
     }
 }
