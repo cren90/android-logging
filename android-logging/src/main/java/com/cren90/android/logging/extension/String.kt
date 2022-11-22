@@ -8,7 +8,7 @@ fun String.isValidJson(): Boolean {
     try{
         gson.fromJson(this, Any::class.java)
         return true
-    } catch (ignored: JsonSyntaxException) {
+    } catch (ignored: Throwable) {
         return false
     }
 }
