@@ -1,7 +1,6 @@
 package com.cren90.android.logging.splitter
 
-import com.cren90.android.logging.extension.isValidJson
-import org.json.JSONObject
+import com.cren90.android.logging.extension.toPrettyJsonIfValid
 
 class AndroidLogSplitter: LogSplitter {
     override val maxLogLineBytesDefault: Int = 4000
@@ -12,11 +11,7 @@ class AndroidLogSplitter: LogSplitter {
         } else {
             listOf(message)
         }.flatMap {
-            if(it.isValidJson()) {
-                JSONObject(it).toString(2).split("\n")
-            } else {
-                listOf(it)
-            }
+            it.toPrettyJsonIfValid().split("\n")
         }
 
          return splitMessage.flatMap {
